@@ -1,0 +1,283 @@
+openapi: 3.0.0
+
+info:
+  description: This is the API of the QuizMaster backend.
+  version: 1.0.0
+  title: QuizMaster API
+  
+tags:
+  - name: Quizzes
+    description: Operations regarding the quiz state managed by QuizMaster
+    
+  - name: Questions
+    description: Operations regarding the questions asked in QuizMaster
+    
+paths:
+  # quiz and quiz state
+  /quiz:
+    post:
+      tags:
+        - Quizzes
+      summary: Create a new quiz
+      requestBody:
+        $ref: '#/components/requestBodies/NewQuiz'
+      responses:
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizState'
+        400:
+          description: Bad request
+          
+  /quiz/{id}:
+    get:
+      tags:
+        - Quizzes
+      summary: Get the current state of the quiz with the given ID
+      parameters:
+        - name: id
+          in: path
+          description: ID of the quiz
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizState'
+        403:
+          description: Forbidden
+        404:
+          description: Not found
+               
+  # questions
+  /question:
+    post:
+      tags:
+        - Questions
+      summary: Create a new question
+      requestBody:
+        $ref: '#/components/requestBodies/NewOrUpdatedQuestion'
+      responses:
+        201:
+          description: Created
+        400:
+          description: Bad request
+  
+  /question/{id}:
+    get:
+      tags:
+        - Questions
+      summary: Get the question with the given ID
+      parameters:
+        - name: id
+          in: path
+          description: ID of the question
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Question'
+        404:
+          description: Not found
+    put:
+      tags:
+        - Questions
+      summary: Update the question with the given ID
+      parameters:
+        - name: id
+          in: path
+          description: ID of the question
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        $ref: '#/components/requestBodies/NewOrUpdatedQuestion'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Question'
+        404:
+          description: Not found
+    delete:
+      tags:
+        - Questions
+      summary: Remove the question with the given ID
+      parameters:
+        - name: id
+          in: path
+          description: ID of the question
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: OK
+        404:
+          description: Not found
+    
+components:
+
+  requestBodies:
+    NewQuiz:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NewQuiz'
+      description: Contains the values to create a new Quiz object
+      required: true
+      
+    NewOrUpdatedQuestion:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NewOrUpdatedQuestion'
+      description: Contains the values to create a new Question object including its answers
+      required: true
+      
+  schemas:
+    # new or updated objects
+    NewQuiz:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        questionCount:
+          type: integer
+          minimum: 10
+          maximum: 30
+      required:
+        - id
+        - questionCount
+      example:
+        id: 5
+        questionCount: 15
+          
+    NewOrUpdatedQuestion:
+      type: object
+      properties:
+        correctAnswer:
+          type: string
+        wrongAnswers:
+          type: array
+          items:
+            type: string
+          minLength: 3
+          maxLength: 3
+      required:
+        - correctAnswer
+        - wrongAnswers
+      example:
+        correctAnswer: "This is my correct answer."
+        wrongAnswers:
+          [
+            "This is my first wrong answer.",
+            "This is my second wrong answer.",
+            "This is my third wrong answer.",
+          ]
+          
+    # existing objects
+    QuizState:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        questionCount:
+          type: integer
+          minimum: 10
+          maximum: 30
+        questionNo:
+          type: integer
+          minimum: 1
+          maximum: 30
+        correctAnswers:
+          type: integer
+          minimum: 0
+          maximum: 30
+        wrongAnswers:
+          type: integer
+          minimum: 0
+          maximum: 30
+        alreadyUsedQuestions:
+          type: array
+          items:
+            type: integer
+            format: int64
+            description: The IDs of the questions that already were used in this QuizMaster run.
+      required:
+        - id
+        - questionCount
+        - questionNo
+        - correctAnswers
+        - wrongAnswers
+        - alreadyUsedQuestions
+      example:
+        id: 4
+        questionCount: 15
+        questionNo: 5
+        correctAnswers: 3
+        wrongAnswers: 1
+        alreadyUsedQuestions: [3, 45, 63]
+        
+    Question:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        possibleAnswers:
+          type: array
+          items:
+            type: object
+            properties:
+              answerLetter:
+                type: string
+                enum: [A, B, C, D]
+              answerText:
+                type: string
+            minLength: 4
+            maxLength: 4
+        correctAnswer:
+          type: string
+          enum: [A, B, C, D]
+      required:
+        - id
+        - possibleAnswers
+        - correctAnswer
+      example:
+        id: 9
+        possibleAnswers:
+          [
+            {
+              answerLetter: A,
+              answerText: Answer A
+            },
+            {
+              answerLetter: B,
+              answerText: Answer B
+            },
+            {
+              answerLetter: C,
+              answerText: Answer C
+            },
+            {
+              answerLetter: D,
+              answerText: Answer D
+            },
+          ]
+        correctAnswer: B
