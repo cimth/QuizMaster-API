@@ -29,7 +29,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/QuizState'
         400:
-          description: Bad request
+          $ref: '#/components/responses/BadRequestError'
           
   /quiz/{id}:
     get:
@@ -58,6 +58,8 @@ paths:
   # questions
   /question:
     post:
+      security:
+        - AdminTokenAuth: []
       tags:
         - Questions
       summary: Create a new question
@@ -67,7 +69,20 @@ paths:
         201:
           description: Created
         400:
-          description: Bad request
+          $ref: '#/components/responses/BadRequestError'
+        401:
+          $ref: '#/components/responses/ForbiddenError'
+    get:
+      tags:
+        - Questions
+      summary: Get a random question
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Question'
   
   /question/{id}:
     get:
@@ -89,8 +104,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/Question'
         404:
-          description: Not found
+          $ref: '#/components/responses/NotFoundError'
     put:
+      security:
+        - AdminTokenAuth: []
       tags:
         - Questions
       summary: Update the question with the given ID
@@ -110,9 +127,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Question'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
         404:
-          description: Not found
+          $ref: '#/components/responses/NotFoundError'
     delete:
+      security:
+        - AdminTokenAuth: []
       tags:
         - Questions
       summary: Remove the question with the given ID
@@ -126,10 +147,32 @@ paths:
       responses:
         200:
           description: OK
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
         404:
-          description: Not found
+          $ref: '#/components/responses/NotFoundError'
+    
+security:
+  - AdminTokenAuth: []
     
 components:
+
+  securitySchemes:
+    AdminTokenAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Admin key from the server's console output after startup
+      
+  responses:
+    BadRequestError:
+      description: Bad request (e.g. wrong formatted parameters)
+    UnauthorizedError:
+      description: Admin token is missing or invalid
+    ForbiddenError:
+      description: Access on the given resource denied
+    NotFoundError:
+      description: The resource does not exist on the server
 
   requestBodies:
     NewQuiz:
