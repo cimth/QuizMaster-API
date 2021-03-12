@@ -61,6 +61,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int64
       responses:
         200:
           description: OK
@@ -83,6 +84,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int64
       requestBody:
         $ref: '#/components/requestBodies/NewOrUpdatedQuestion'
       responses:
@@ -109,6 +111,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int64
       responses:
         200:
           description: OK
@@ -178,6 +181,8 @@ components:
     NewOrUpdatedQuestion:
       type: object
       properties:
+        questionText:
+          type: string
         correctAnswer:
           type: string
         wrongAnswers:
@@ -187,9 +192,11 @@ components:
           minLength: 3
           maxLength: 3
       required:
+        - questionText
         - correctAnswer
         - wrongAnswers
       example:
+        questionText: "What is my question?"
         correctAnswer: "This is my correct answer."
         wrongAnswers:
           [
@@ -213,6 +220,8 @@ components:
         id:
           type: integer
           format: int64
+        questionText:
+          type: string
         possibleAnswers:
           type: array
           items:
@@ -230,10 +239,12 @@ components:
           enum: [A, B, C, D]
       required:
         - id
+        - questionText
         - possibleAnswers
         - correctAnswer
       example:
         id: 9
+        questionText: Which answer is correct?
         possibleAnswers:
           [
             {
