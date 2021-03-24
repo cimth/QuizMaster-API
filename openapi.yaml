@@ -7,7 +7,7 @@ info:
   
 tags:
   - name: Quizzes
-    description: Requests for creating quizzes
+    description: Requests for CRUD operations on quizzes
     
   - name: Questions
     description: Requests for CRUD operations on questions
