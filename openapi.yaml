@@ -108,6 +108,13 @@ paths:
           $ref: '#/components/responses/BadRequestError'
         401:
           $ref: '#/components/responses/UnauthorizedError'
+    get:
+      tags:
+        - Questions
+      summary: Get all questions from the database (unprocessed, thus without answer letters etc.)
+      responses:
+        200:
+          $ref: '#/components/responses/AllQuestions'
   
   /question/{id}:
     get:
@@ -209,6 +216,13 @@ components:
             $ref: '#/components/schemas/AllPredefinedQuizzes'
       description: Contains all predefined quizzes from the database in a nice-to-use representation
 
+    AllQuestions:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AllQuestions'
+      description: Contains all questions from the database (unprocessed, thus without answer letters etc.)
+
   requestBodies:
     NewRandomQuiz:
       content:
@@ -292,27 +306,6 @@ components:
         quizName: My updated Quiz
         quizQuestions: [1, 6, 19, 3]
 
-    AllPredefinedQuizzes:
-      type: array
-      items:
-        type: object
-        properties:
-          quizId:
-            type: integer
-            format: int64
-          quizName:
-            type: string
-          quizCount:
-            type: integer
-          isPlayable:
-            type: boolean
-        example:
-          {
-            quizName: My Quiz,
-            quizQuestions: 13,
-            isPlayable: true
-          }
-
     NewOrUpdatedQuestion:
       type: object
       properties:
@@ -348,6 +341,27 @@ components:
       items:
         type: integer
       example: [ 13, 26, 7, 33 ]
+
+    AllPredefinedQuizzes:
+      type: array
+      items:
+        type: object
+        properties:
+          quizId:
+            type: integer
+            format: int64
+          quizName:
+            type: string
+          quizCount:
+            type: integer
+          isPlayable:
+            type: boolean
+        example:
+          {
+            quizName: My Quiz,
+            quizQuestions: 13,
+            isPlayable: true
+          }
 
     Question:
       type: object
@@ -400,3 +414,8 @@ components:
             },
           ]
         correctAnswer: B
+
+    AllQuestions:
+      type: array
+      items:
+        $ref: '#/components/schemas/Question'
