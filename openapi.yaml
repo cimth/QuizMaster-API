@@ -16,6 +16,25 @@ paths:
   # quizzes
   /quiz:
     post:
+      security:
+        - AdminTokenAuth: []
+      tags:
+        - Quizzes
+      summary: Creates an (empty) predefined quiz with the given name
+      requestBody:
+        $ref: '#/components/requestBodies/NewPredefinedQuiz'
+      responses:
+        200:
+          description: OK
+        400:
+          $ref: '#/components/responses/BadRequestError'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        404:
+          description: At least one of the given questions which should be applied to the quiz does not exist
+
+  /quiz/random:
+    get:
       tags:
         - Quizzes
       summary: Get an array of random question IDs for starting a quiz basing on them
@@ -30,7 +49,48 @@ paths:
                 $ref: '#/components/schemas/Quiz'
         400:
           $ref: '#/components/responses/BadRequestError'
-               
+        404:
+          description: Not enough questions for creating a quiz (at least 10 questions have to exist)
+
+  /quiz/predefined:
+    get:
+      tags:
+        - Quizzes
+      summary: Get an array of all predefined quizzes in a nice-to-use representation
+      responses:
+        200:
+          $ref: '#/components/responses/AllPredefinedQuizzes'
+
+  /quiz/{id}:
+    get:
+      tags:
+        - Quizzes
+      summary: Get the array of question IDs applied to the predefined quiz with the given ID
+      responses:
+        200:
+          description: Returns an array of X question IDs where X is the count of the questions that are applied to the predefined quiz
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quiz'
+        404:
+            $ref: '#/components/responses/NotFoundError'
+    put:
+      security:
+        - AdminTokenAuth: []
+      tags:
+        - Quizzes
+      summary: Updates the predefined quiz with the given ID. With this request you can change the quiz name, apply questions to the quiz or delete existing question associations.
+      requestBody:
+        $ref: '#/components/requestBodies/UpdatePredefinedQuiz'
+      responses:
+        200:
+          description: OK
+        400:
+          $ref: '#/components/responses/BadRequestError'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+
   # questions
   /question:
     post:
@@ -47,7 +107,7 @@ paths:
         400:
           $ref: '#/components/responses/BadRequestError'
         401:
-          $ref: '#/components/responses/ForbiddenError'
+          $ref: '#/components/responses/UnauthorizedError'
   
   /question/{id}:
     get:
@@ -134,13 +194,20 @@ components:
       
   responses:
     BadRequestError:
-      description: Bad request (e.g. wrong formatted parameters)
+      description: Bad request (e.g. wrong formatted or invalid parameters). The response body will show more details about the occured error(s).
+
     UnauthorizedError:
       description: Admin token is missing or invalid
-    ForbiddenError:
-      description: Access on the given resource denied
+
     NotFoundError:
       description: The resource does not exist on the server
+
+    AllPredefinedQuizzes:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AllPredefinedQuizzes'
+      description: Contains all predefined quizzes from the database in a nice-to-use representation
 
   requestBodies:
     NewRandomQuiz:
@@ -150,7 +217,23 @@ components:
             $ref: '#/components/schemas/NewRandomQuiz'
       description: Contains the count of question IDs that should be returned and optionally IDs of questions that were already used by the client
       required: true
-      
+
+    NewPredefinedQuiz:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NewPredefinedQuiz'
+      description: Contains the name of the predefined quiz which is about to be created
+      required: true
+
+    UpdatePredefinedQuiz:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UpdatePredefinedQuiz'
+      description: Contains the data of the predefined quiz which are possibly different of the original data
+      required: true
+
     NewOrUpdatedQuestion:
       content:
         application/json:
@@ -177,6 +260,58 @@ components:
       example:
         id: 37
         alreadyUsedQuestions: [ 3, 27, 18 ]
+
+    NewPredefinedQuiz:
+      type: object
+      properties:
+        quizName:
+          type: string
+          description: the name of the quiz to be created
+      required:
+        - quizName
+      example:
+        quizName: My new Quiz
+
+    UpdatePredefinedQuiz:
+      type: object
+      properties:
+        quizName:
+          type: string
+          description: the (updated) name of the quiz
+        quizQuestions:
+          type: array
+          items:
+            type: integer
+            format: int64
+          minLength: 10
+          maxLength: 30
+      required:
+        - quizName
+        - quizQuestions
+      example:
+        quizName: My updated Quiz
+        quizQuestions: [1, 6, 19, 3]
+
+    AllPredefinedQuizzes:
+      type: array
+      items:
+        type: object
+        properties:
+          quizId:
+            type: integer
+            format: int64
+          quizName:
+            type: string
+          quizCount:
+            type: integer
+          isPlayable:
+            type: boolean
+        example:
+          {
+            quizName: My Quiz,
+            quizQuestions: 13,
+            isPlayable: true
+          }
 
     NewOrUpdatedQuestion:
       type: object
