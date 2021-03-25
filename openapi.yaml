@@ -24,8 +24,8 @@ paths:
       requestBody:
         $ref: '#/components/requestBodies/NewPredefinedQuiz'
       responses:
-        200:
-          description: OK
+        201:
+          description: Created
         400:
           $ref: '#/components/responses/BadRequestError'
         401:
@@ -41,7 +41,7 @@ paths:
       requestBody:
         $ref: '#/components/requestBodies/NewRandomQuiz'
       responses:
-        201:
+        200:
           description: Returns an array of X question IDs where X is the value of 'questionCount'
           content:
             application/json:
