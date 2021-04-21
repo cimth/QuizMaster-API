@@ -316,7 +316,7 @@ components:
       required:
         - questionCount
       example:
-        id: 37
+        questionCount: 15
         alreadyUsedQuestions: [ 3, 27, 18 ]
 
     NewPredefinedQuiz:
@@ -341,8 +341,6 @@ components:
           items:
             type: integer
             format: int64
-          minLength: 10
-          maxLength: 30
       required:
         - quizName
         - quizQuestions
@@ -380,8 +378,6 @@ components:
     # response objects
     Quiz:
       type: array
-      minItems: 10
-      maxItems: 30
       items:
         type: integer
       example: [ 13, 26, 7, 33 ]
@@ -398,13 +394,11 @@ components:
             type: string
           quizCount:
             type: integer
-          isPlayable:
-            type: boolean
         example:
           {
+            quizId: 5,
             quizName: My Quiz,
-            quizQuestions: 13,
-            isPlayable: true
+            quizQuestions: 13
           }
 
     QuestionInRawFormat:
