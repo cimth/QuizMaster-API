@@ -25,7 +25,7 @@ paths:
         $ref: '#/components/requestBodies/NewPredefinedQuiz'
       responses:
         201:
-          description: Created
+          $ref: '#/components/responses/NewPredefinedQuiz'
         400:
           $ref: '#/components/responses/BadRequestError'
         401:
@@ -120,7 +120,7 @@ paths:
         $ref: '#/components/requestBodies/NewOrUpdatedQuestion'
       responses:
         201:
-          description: Created
+          $ref: '#/components/responses/QuestionInRawFormat'
         400:
           $ref: '#/components/responses/BadRequestError'
         401:
@@ -260,6 +260,21 @@ components:
             $ref: '#/components/schemas/AllPredefinedQuizzes'
       description: Contains all predefined quizzes from the database in a nice-to-use representation
 
+    NewPredefinedQuiz:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PredefinedQuiz'
+      description: Contains the new predefined quiz, including its ID and a question count of 0.
+
+    QuestionInRawFormat:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/QuestionInRawFormat'
+      description: Contains the created question from the database (unprocessed, thus without answer letters etc.), including the ID
+
+
     AllQuestions:
       content:
         application/json:
@@ -382,24 +397,25 @@ components:
         type: integer
       example: [ 13, 26, 7, 33 ]
 
+    PredefinedQuiz:
+      type: object
+      properties:
+        quizId:
+          type: integer
+          format: int64
+        quizName:
+          type: string
+        quizCount:
+          type: integer
+      example:
+        quizId: 5
+        quizName: My Quiz
+        quizQuestions: 0
+
     AllPredefinedQuizzes:
       type: array
       items:
-        type: object
-        properties:
-          quizId:
-            type: integer
-            format: int64
-          quizName:
-            type: string
-          quizCount:
-            type: integer
-        example:
-          {
-            quizId: 5,
-            quizName: My Quiz,
-            quizQuestions: 13
-          }
+        $ref: '#/components/schemas/PredefinedQuiz'
 
     QuestionInRawFormat:
       type: object
