@@ -34,7 +34,7 @@ paths:
           description: At least one of the given questions which should be applied to the quiz does not exist
 
   /quiz/random:
-    get:
+    post:
       tags:
         - Quizzes
       summary: Get an array of random question IDs for starting a quiz basing on them
