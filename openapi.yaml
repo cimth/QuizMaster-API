@@ -133,7 +133,21 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/AllQuestions'
-  
+
+  /question/count:
+    get:
+      tags:
+        - Questions
+      summary: Get the total count of questions inside the database
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int64
+
   /question/{id}:
     get:
       tags:
@@ -245,7 +259,7 @@ components:
       
   responses:
     BadRequestError:
-      description: Bad request (e.g. wrong formatted or invalid parameters). The response body will show more details about the occured error(s).
+      description: Bad request (e.g. wrong formatted or invalid parameters). The response body will show more details about the occurred error(s).
 
     UnauthorizedError:
       description: Admin token is missing or invalid
